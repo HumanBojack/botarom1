@@ -6,6 +6,7 @@ load_dotenv(override=True)
 
 # import commands
 from commands.ping import Ping
+from commands.asterix import Asterix
 
 # Auth on twitter and verify
 auth = tweepy.OAuthHandler(os.getenv("CONSUMER_KEY"), os.getenv("CONSUMER_SECRET"))
@@ -28,6 +29,7 @@ class MainListener():
 
     # get the different avaiable commands
     self.ping = Ping(api)
+    self.asterix = Asterix(api)
 
 
   def check_mentions(self):
@@ -41,7 +43,10 @@ class MainListener():
       # Checking if user asked for a ping
       if any(keyword in tweet.text.lower() for keyword in self.ping.keywords):
         self.ping.answer_tweet(tweet)
-        continue
+
+      elif any(keyword in tweet.text.lower() for keyword in self.asterix.keywords):
+        if tweet.in_reply_to_status_id is not None:
+          self.asterix.answer_tweet(tweet)      
 
     if new_id > self.last_id:
       self.set_last_id(new_id)
